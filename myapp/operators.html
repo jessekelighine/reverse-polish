@@ -1,0 +1,68 @@
+<hr />
+<h4 id="usage">Usage</h4>
+<p>Input a command in reverse-polish notation (RPN) and see the output
+and infix notation representation!</p>
+<p><strong>Note</strong>: Separate the operators/operands with spaces.
+You can find examples at the end of this page.</p>
+<h4 id="available-operators">Available Operators</h4>
+<ul>
+<li><code>+</code> <strong>ADD</strong>: <em>add</em> the last two
+numbers on stack.</li>
+<li><code>-</code> <strong>SUBTRACT</strong>: <em>subtract</em> the last
+two numbers on stack.</li>
+<li><code>*</code> <strong>MULTIPLY</strong>: <em>multiply</em> the last
+two numbers on stack.</li>
+<li><code>/</code> <strong>DIVIDE</strong>: <em>divide</em> the last two
+numbers of stack.</li>
+<li><code>^</code> <strong>POWER</strong>: raise the second-to-last
+number to the <em>power</em> of the last number on stack.</li>
+<li><code>v</code> <strong>SQUARE ROOT</strong>: calculate the
+<em>square root</em> of the last number on stack.</li>
+<li><code>~</code> <strong>NEGATE</strong>: shorthand for
+<code>-1 *</code>, i.e., <em>negate</em> the last number on stack.</li>
+<li><code>!</code> <strong>FACTORIAL</strong>: calculate the
+<em>factorial</em> of the last number on stack.</li>
+<li><code>|</code> <strong>SWAP</strong>: <em>swap</em> the positions of
+the last two number on stack.</li>
+<li><code>=</code> <strong>POP</strong>: <em>pop</em> or remove the last
+number on stack.</li>
+</ul>
+<h4 id="examples">Examples</h4>
+<p>The following are some examples: first in RPN, then in infix
+notation, then the output.</p>
+<p><strong>Tip</strong>: Copy the RPN in the input and verify that the
+output is correct!</p>
+<table>
+<thead>
+<tr class="header">
+<th>RPN</th>
+<th>infix</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>2 0.5 ^</code>  </td>
+<td><code>2^0.5</code>  </td>
+<td><code>1.414</code></td>
+</tr>
+<tr class="even">
+<td><code>2 3 + 4 -</code>  </td>
+<td><code>( 2 + 3 ) - 4</code>  </td>
+<td><code>1</code></td>
+</tr>
+<tr class="odd">
+<td><code>1 2 + 3 ^ ~</code>  </td>
+<td><code>-( ( 1 + 2 ) ^ 3 )</code>  </td>
+<td><code>-27</code></td>
+</tr>
+<tr class="even">
+<td><code>4 1 - 2 ^ 8 4 - 2 ^ + v</code> </td>
+<td><code>sqrt( (4-1)^2 + (8-4)^2 )</code> </td>
+<td><code>5</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>Author: Jesse C. Chen (<a
+href="https://jessekelighine.com">jessekelighine.com</a>) <br> <br></p>
