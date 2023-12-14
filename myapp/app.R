@@ -11,27 +11,22 @@ library(shiny)
 library(methods)
 ###############################################################################
 
-Stack <- setRefClass("Stack",
-                     fields  = list(values="vector", length="numeric"),
-                     methods = list(initialize = function () {
-                                      length <<- 0
-                                    },
-                                    push = function ( item ) {
-                                      values <<- c(values, item)
-                                      length <<- length + length(item)
-                                      values[length]
-                                    },
-                                    pop = function ( n=1 ) {
-                                      if ( length == 0 ) return(NULL)
-                                      if ( length < n )  return(NULL)
-                                      item    <- values[(length-n+1):length]
-                                      length <<- length - n
-                                      values <<- if ( length==0 ) vector() else values[1:length]
-                                      item
-                                    },
-                                    top = function() values[length]
-                     )
-)
+### Stack Object ##############################################################
+
+Stack <- setRefClass("Stack", fields=list(values="vector",length="numeric"))
+Stack$methods(initialize = function () length <<- 0)
+Stack$methods(push = function ( item ) {
+                values <<- c(values, item)
+                length <<- length + length(item)
+                return(values[length]) })
+Stack$methods(pop = function ( n=1 ) {
+                if ( length == 0 | length < n ) return(NULL)
+                item    <- values[(length-n+1):length]
+                length <<- length - n
+                values <<- if ( length==0 ) vector() else values[1:length]
+                return(item) })
+
+### Helper Functions ##########################################################
 
 parse         <- list()
 parse$split   <- function ( command ) strsplit(command,split=" +")[[1]]
@@ -55,8 +50,6 @@ parse$eval    <- function ( opnds, optr ) {
 
 ### Main Function #############################################################
 
-# precedence: ! = v = ~ = ^ > * = / > + = -
-
 to.infix <- function ( command ) {
   stack.out <- Stack()
   stack.opt <- Stack()
@@ -69,86 +62,48 @@ to.infix <- function ( command ) {
     if ( parse$is.optr(item) ) {
       n.opnd <- parse$optr[item]
       if ( stack.out$length < n.opnd ) return(paste("Not enough operands for", paste0('"',item,'"')))
+      out <- stack.out$pop(n.opnd)
+      opt <- stack.opt$pop(n.opnd)
+      if ( item=="=" ) next
       if ( item=="|" ) {
-        out <- stack.out$pop(2)
-        opt <- stack.opt$pop(2)
-         stack.out$push(out[2:1])
-         stack.opt$push(opt[2:1])
-        next
-      }
-      if ( item=="=" ) {
-        stack.out$pop()
-        stack.opt$pop()
-        next
-      }
-      if ( item=="!" ) {
-        opt <- stack.opt$pop()
-        out <- stack.out$pop()
+        out <- out[2:1]
+        opt <- opt[2:1]
+      } else if ( item=="!" ) {
         out <- if ( opt %in% c("1","v") ) paste0(out,"!") else paste0("(",out,")!")
-        stack.out$push(out)
-        stack.opt$push("!")
-        next
-      }
-      if ( item=="~" ) {
-        opt <- stack.opt$pop()
-        out <- stack.out$pop()
-        out <- if ( opt %in% c("1","v") ) paste0("-",out) else paste0("-(",out,")")
-        stack.out$push(out)
-        stack.opt$push("~")
-        next
-      }
-      if ( item=="v" ) {
-        opt <- stack.opt$pop()
-        out <- stack.out$pop()
-        stack.out$push(paste0("sqrt(",out,")"))
-        stack.opt$push("v")
-        next
-      }
-      if ( item=="^" ) {
-        opt <- stack.opt$pop(2)
-        out <- stack.out$pop(2)
+        opt <- item
+      } else if ( item=="~" ) {
+        out <- if ( opt %in% c("1","v","^") ) paste0("-",out) else paste0("-(",out,")")
+        opt <- item
+      } else if ( item=="v" ) {
+        out <- paste0("sqrt(",out,")")
+        opt <- item
+      } else if ( item=="^" ) {
         if ( ! opt[1] %in% c("1","v") ) out[1] <- paste0("(",out[1],")")
         if ( ! opt[2] %in% c("1","v") ) out[2] <- paste0("(",out[2],")")
-        stack.out$push(paste0(out[1],"^",out[2]))
-        stack.opt$push("^")
-        next
-      }
-      if ( item=="/" ) {
-        opt <- stack.opt$pop(2)
-        out <- stack.out$pop(2)
-        if ( ! opt[1] %in% c("1","!","~","v") ) out[1] <- paste0("(",out[1],")")
+        out <- paste0(out[1],"^",out[2])
+        opt <- item
+      } else if ( item=="/" ) {
+        if (   opt[1] %in% c("+","-")     ) out[1] <- paste0("(",out[1],")")
         if ( ! opt[2] %in% c("1","!","v") ) out[2] <- paste0("(",out[2],")")
-        stack.out$push(paste(out[1],"/",out[2]))
-        stack.opt$push("/")
-        next
-      }
-      if ( item=="*" ) {
-        opt <- stack.opt$pop(2)
-        out <- stack.out$pop(2)
+        out <- paste(out[1],"/",out[2])
+        opt <- item
+      } else if ( item=="*" ) {
         if ( opt[1] %in% c("+","-") ) out[1] <- paste0("(",out[1],")")
         if ( opt[2] %in% c("+","-") ) out[2] <- paste0("(",out[2],")")
-        stack.out$push(paste(out[1],"*",out[2]))
-        stack.opt$push("*")
-        next
-      }
-      if ( item=="+" ) {
-        opt <- stack.opt$pop(2)
-        out <- stack.out$pop(2)
+        out <- paste(out[1],"*",out[2])
+        opt <- item
+      } else if ( item=="+" ) {
         if ( opt[2]==1 & out[2]<0 ) out[2] <- paste0("(",out[2],")")
-        stack.out$push(paste(out[1],"+",out[2]))
-        stack.opt$push("+")
-        next
-      }
-      if ( item=="-" ) {
-        opt <- stack.opt$pop(2)
-        out <- stack.out$pop(2)
+        out <- paste(out[1],"+",out[2])
+        opt <- item
+      } else if ( item=="-" ) {
         if ( ! opt[2] %in% c("1","!","v","^","*") ) out[2] <- paste0("(",out[2],")")
-        stack.out$push(paste(out[1],"-",out[2]))
-        stack.opt$push("-")
-        next
-      }
-    }
-    return(paste("Input", paste0('"',item,'"'), "is not a legal command"))
+        out <- paste(out[1],"-",out[2])
+        opt <- item
+      } else { return("???") }
+      stack.out$push(out)
+      stack.opt$push(opt)
+    } else { return(paste("Input", paste0('"',item,'"'), "is not a legal command")) }
   }
   return(stack.out$values)
 }
@@ -159,13 +114,13 @@ evaluate <- function ( command ) {
     if ( parse$is.opnd(item) ) { stack$push(item); next }
     if ( parse$is.optr(item) ) {
       n.opnd <- parse$optr[item]
-      if ( stack$length < n.opnd ) return(c("Not enough operands for", paste0('"',item,'"')))
+      if ( stack$length < n.opnd ) return(paste("Not enough operands for", paste0('"',item,'"')))
       output <- stack$pop(n.opnd)
       output <- parse$eval(opnds=output, optr=item)
       stack$push(output)
       next
     }
-    return(c("Input", paste0('"',item,'"'), "is not a legal command"))
+    return(paste("Input", paste0('"',item,'"'), "is not a legal command"))
   }
   return(stack$values)
 }
@@ -189,7 +144,7 @@ ui <- fluidPage(verticalLayout(div(style=style.sheet,
 
 server <- function ( input, output ) {
   output$infix <- renderText({ paste(to.infix(input$command),collapse=", ") |> ( \ (x) if (x=="") "\u200B" else x )() })
-  output$stack <- renderText({ paste(evaluate(input$command),collapse=" ")  |> ( \ (x) if (x=="") "\u200B" else x )() })
+  output$stack <- renderText({ paste(evaluate(input$command),collapse=", ") |> ( \ (x) if (x=="") "\u200B" else x )() })
 }
 
 shinyApp(ui=ui, server=server)
