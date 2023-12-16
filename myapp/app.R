@@ -30,20 +30,22 @@ Stack$methods(pop = function ( n=1 ) {
 
 parse         <- list()
 parse$split   <- function ( command ) strsplit(command,split=" +")[[1]]
-parse$optr    <- c("+"=2,"-"=2,"*"=2,"/"=2,"^"=2,"v"=1,"~"=1,"|"=2,"!"=1,"="=1)
-parse$opnd    <- "^[-]{0,1}([0-9]*\\.){0,1}[0-9]+$"
+parse$optr    <- c("+"=2,"-"=2,"*"=2,"/"=2,"^"=2,"sqrt"=1,"~"=1,"!"=1,"%"=1,"&"=2,"="=1,"abs"=1)
+parse$opnd    <- "^([-]{0,1}([0-9]*\\.){0,1}[0-9]+|[a-zA-Z])$"
 parse$is.optr <- function ( item ) item %in% names(parse$optr)
 parse$is.opnd <- function ( item ) item |> grepl(pattern=parse$opnd, x=_)
 parse$eval    <- function ( opnds, optr ) {
-  if ( optr=="+" ) output <- as.numeric(opnds[1]) + as.numeric(opnds[2])
-  if ( optr=="-" ) output <- as.numeric(opnds[1]) - as.numeric(opnds[2])
-  if ( optr=="*" ) output <- as.numeric(opnds[1]) * as.numeric(opnds[2])
-  if ( optr=="/" ) output <- as.numeric(opnds[1]) / as.numeric(opnds[2])
-  if ( optr=="^" ) output <- as.numeric(opnds[1]) ^ as.numeric(opnds[2])
-  if ( optr=="v" ) output <- sqrt(as.numeric(opnds))
-  if ( optr=="~" ) output <- -as.numeric(opnds)
-  if ( optr=="!" ) output <- factorial(as.numeric(opnds))
-  if ( optr=="|" ) output <- c( as.numeric(opnds[2]), as.numeric(opnds[1]) )
+  if ( optr=="+"    ) output <- as.numeric(opnds[1]) + as.numeric(opnds[2])
+  if ( optr=="-"    ) output <- as.numeric(opnds[1]) - as.numeric(opnds[2])
+  if ( optr=="*"    ) output <- as.numeric(opnds[1]) * as.numeric(opnds[2])
+  if ( optr=="/"    ) output <- as.numeric(opnds[1]) / as.numeric(opnds[2])
+  if ( optr=="^"    ) output <- as.numeric(opnds[1]) ^ as.numeric(opnds[2])
+  if ( optr=="sqrt" ) output <- sqrt(as.numeric(opnds))
+  if ( optr=="abs"  ) output <- abs(as.numeric(opnds))
+  if ( optr=="~"    ) output <- -as.numeric(opnds)
+  if ( optr=="!"    ) output <- factorial(as.numeric(opnds))
+  if ( optr=="%"    ) output <- 1 / as.numeric(opnds)
+  if ( optr=="&"    ) output <- c( as.numeric(opnds[2]), as.numeric(opnds[1]) )
   if ( optr=="=" ) return(NULL)
   as.character(output)
 }
@@ -56,54 +58,57 @@ to.infix <- function ( command ) {
   for ( item in parse$split(command) ) {
     if ( parse$is.opnd(item) ) {
       stack.out$push(item)
-      stack.opt$push("1")
+      if ( grepl("^[a-zA-Z]$",item) ) stack.opt$push("a") else stack.opt$push("1")
       next
     }
     if ( parse$is.optr(item) ) {
       n.opnd <- parse$optr[item]
-      if ( stack.out$length < n.opnd ) return(paste("Not enough operands for", paste0('"',item,'"')))
+      if ( stack.out$length < n.opnd ) return(paste("ERROR: Not enough operands for", paste0('"',item,'"')))
       out <- stack.out$pop(n.opnd)
       opt <- stack.opt$pop(n.opnd)
       if ( item=="=" ) next
-      if ( item=="|" ) {
+      if ( item=="&" ) {
         out <- out[2:1]
         opt <- opt[2:1]
+      } else if ( item=="%" ) {
+        out <- paste("\\frac1{",out,"}")
+        opt <- item
       } else if ( item=="!" ) {
-        out <- if ( opt %in% c("1","v") ) paste0(out,"!") else paste0("(",out,")!")
+        out <- if ( opt %in% c("1","a") ) paste0(out,"!") else paste0("\\left(",out,"\\right)!")
         opt <- item
       } else if ( item=="~" ) {
-        out <- if ( opt %in% c("1","v","^") ) paste0("-",out) else paste0("-(",out,")")
+        out <- if ( opt %in% c("1","a","sqrt","^") ) paste0("-",out) else paste0("-\\left(",out,"\\right)")
         opt <- item
-      } else if ( item=="v" ) {
-        out <- paste0("sqrt(",out,")")
+      } else if ( item=="abs" ) {
+        out <- paste0("\\left|",out,"\\right|")
+        opt <- item
+      } else if ( item=="sqrt" ) {
+        out <- paste0("\\sqrt{",out,"}")
         opt <- item
       } else if ( item=="^" ) {
-        if ( ! opt[1] %in% c("1","v") ) out[1] <- paste0("(",out[1],")")
-        if ( ! opt[2] %in% c("1","v") ) out[2] <- paste0("(",out[2],")")
-        out <- paste0(out[1],"^",out[2])
+        if ( ! opt[1] %in% c("1","a","sqrt") ) out[1] <- paste0("\\left(",out[1],"\\right)")
+        out <- paste0(out[1],"^{",out[2],"}")
         opt <- item
       } else if ( item=="/" ) {
-        if (   opt[1] %in% c("+","-")     ) out[1] <- paste0("(",out[1],")")
-        if ( ! opt[2] %in% c("1","!","v") ) out[2] <- paste0("(",out[2],")")
-        out <- paste(out[1],"/",out[2])
+        out <- paste("\\frac{",out[1],"}{",out[2],"}")
         opt <- item
       } else if ( item=="*" ) {
-        if ( opt[1] %in% c("+","-") ) out[1] <- paste0("(",out[1],")")
-        if ( opt[2] %in% c("+","-") ) out[2] <- paste0("(",out[2],")")
-        out <- paste(out[1],"*",out[2])
+        if ( opt[1] %in% c("+","-") ) out[1] <- paste0("\\left(",out[1],"\\right)")
+        if ( opt[2] %in% c("+","-") ) out[2] <- paste0("\\left(",out[2],"\\right)")
+        out <- paste(out[1],ifelse(opt[1]=="1" & opt[2]=="1","\\cdot",""),out[2])
         opt <- item
       } else if ( item=="+" ) {
-        if ( opt[2]==1 & out[2]<0 ) out[2] <- paste0("(",out[2],")")
+        if ( opt[2]==1 & out[2]<0 ) out[2] <- paste0("\\left(",out[2],"\\right)")
         out <- paste(out[1],"+",out[2])
         opt <- item
       } else if ( item=="-" ) {
-        if ( ! opt[2] %in% c("1","!","v","^","*") ) out[2] <- paste0("(",out[2],")")
+        if ( ! opt[2] %in% c("1","a","!","sqrt","^","*") ) out[2] <- paste0("\\left(",out[2],"\\right)")
         out <- paste(out[1],"-",out[2])
         opt <- item
-      } else { return("???") }
+      } else { return("ERROR: ???") }
       stack.out$push(out)
       stack.opt$push(opt)
-    } else { return(paste("Input", paste0('"',item,'"'), "is not a legal command")) }
+    } else { return(paste("ERROR: Input", paste0('"',item,'"'), "is not a legal command")) }
   }
   return(stack.out$values)
 }
@@ -114,13 +119,13 @@ evaluate <- function ( command ) {
     if ( parse$is.opnd(item) ) { stack$push(item); next }
     if ( parse$is.optr(item) ) {
       n.opnd <- parse$optr[item]
-      if ( stack$length < n.opnd ) return(paste("Not enough operands for", paste0('"',item,'"')))
+      if ( stack$length < n.opnd ) return(paste("ERROR: Not enough operands for", paste0('"',item,'"')))
       output <- stack$pop(n.opnd)
       output <- parse$eval(opnds=output, optr=item)
       stack$push(output)
       next
     }
-    return(paste("Input", paste0('"',item,'"'), "is not a legal command"))
+    return(paste("ERROR: Input", paste0('"',item,'"'), "is not a legal command"))
   }
   return(stack$values)
 }
@@ -128,7 +133,7 @@ evaluate <- function ( command ) {
 ### Shiny #####################################################################
 
 style.sheet <- "width: auto;
-max-width: 45em;
+max-width: 50em;
 margin: 0 auto;
 padding: 10px 20px;
 font-family: monospace;
@@ -139,12 +144,16 @@ ui <- fluidPage(verticalLayout(div(style=style.sheet,
                                    h3(strong("RPN Calculator")),br(),
                                    textInput(inputId="command", label="Input Command"),
                                    strong("Output (Stack):"), textOutput("stack"),
-                                   strong("Infix Notation:"), textOutput("infix"),
+                                   strong("Infix Notation:"), uiOutput("infix"),
                                    HTML(readLines("operators.html")))))
 
 server <- function ( input, output ) {
-  output$infix <- renderText({ paste(to.infix(input$command),collapse=", ") |> ( \ (x) if (x=="") "\u200B" else x )() })
   output$stack <- renderText({ paste(evaluate(input$command),collapse=", ") |> ( \ (x) if (x=="") "\u200B" else x )() })
+  output$infix <- renderUI({
+      paste(to.infix(input$command),collapse=", ") |> 
+      ( \ (y) if ( y == "" ) "\u200B" else if ( grepl("ERROR",y) ) y else paste0("$$",y,"$$") )() |> 
+      withMathJax()
+  })
 }
 
 shinyApp(ui=ui, server=server)

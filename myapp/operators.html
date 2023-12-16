@@ -16,14 +16,19 @@ two numbers on stack.</li>
 numbers of stack.</li>
 <li><code>^</code> <strong>POWER</strong>: raise the second-to-last
 number to the <em>power</em> of the last number on stack.</li>
-<li><code>v</code> <strong>SQUARE ROOT</strong>: calculate the
-<em>square root</em> of the last number on stack.</li>
 <li><code>~</code> <strong>NEGATE</strong>: shorthand for
 <code>-1 *</code>, i.e., <em>negate</em> the last number on stack.</li>
 <li><code>!</code> <strong>FACTORIAL</strong>: calculate the
 <em>factorial</em> of the last number on stack.</li>
-<li><code>|</code> <strong>SWAP</strong>: <em>swap</em> the positions of
-the last two number on stack.</li>
+<li><code>%</code> <strong>RECIPROCAL</strong>: shorthand for
+<code>1 &amp; /</code>, i.e., calculate the <em>reciprocal</em> of the
+last number on stack.</li>
+<li><code>sqrt</code> <strong>SQUARE ROOT</strong>: calculate the
+<em>square root</em> of the last number on stack.</li>
+<li><code>abs</code> <strong>ABSOLUTE</strong>: calculate the
+<em>absolute value</em> the last number on stack.</li>
+<li><code>&amp;</code> <strong>SWAP</strong>: <em>swap</em> the
+positions of the last two number on stack.</li>
 <li><code>=</code> <strong>POP</strong>: <em>pop</em> or remove the last
 number on stack.</li>
 </ul>
@@ -34,9 +39,9 @@ notation, then the output.</p>
 output is correct!</p>
 <table>
 <colgroup>
-<col style="width: 40%" />
-<col style="width: 46%" />
-<col style="width: 13%" />
+<col style="width: 43%" />
+<col style="width: 44%" />
+<col style="width: 12%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -62,7 +67,7 @@ output is correct!</p>
 <td><code>-27</code></td>
 </tr>
 <tr class="even">
-<td><code>4 1 - 2 ^ 8 4 - 2 ^ + v</code> </td>
+<td><code>4 1 - 2 ^ 8 4 - 2 ^ + sqrt</code> </td>
 <td><code>sqrt((4 - 1)^2 + (8 - 4)^2)</code> </td>
 <td><code>5</code></td>
 </tr>
