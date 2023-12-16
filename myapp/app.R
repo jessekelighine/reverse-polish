@@ -141,6 +141,7 @@ font-size: 10pt;
 font-weight: 500;"
 
 ui <- fluidPage(verticalLayout(div(style=style.sheet,
+                                   withMathJax(),
                                    h3(strong("RPN Calculator")),br(),
                                    textInput(inputId="command", label="Input Command"),
                                    strong("Output (Stack):"), textOutput("stack"),
