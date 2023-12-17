@@ -1,0 +1,27 @@
+/* TABLE */
+
+table {
+	margin: 0 auto;
+	padding: 10px;
+    border-collapse: collapse;
+}
+
+tr {
+    border-bottom: 1px solid #666666;
+}
+
+tr:nth-child(even) {
+	background-color: #fdfdfd;
+}
+
+td {
+	padding: 10px;
+}
+
+th {
+	text-align: left;
+	background-color: #fbfbfb;
+	padding: 15px;
+	border-top: 2px solid #666666;
+	border-bottom: 2px solid #666666;
+}

@@ -5,5 +5,5 @@ all: docs
 clean:
 	rm -rf docs
 
-docs: myapp makeapp.R
+docs: reverse-polish/ makeapp.R
 	Rscript makeapp.R
