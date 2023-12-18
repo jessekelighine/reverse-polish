@@ -32,6 +32,13 @@ Stack <- setRefClass("Stack",
 ### Operators & Parsing #######################################################
 
 operator <- list()
+parse    <- list()
+
+parse$split   <- function ( command ) strsplit(command,split=" +")[[1]]
+parse$is.neg  <- function ( str  ) substr(str,start=1,stop=1)=="-"
+parse$is.optr <- function ( item ) item %in% names(operator)
+parse$is.opnd <- function ( item ) item |> grepl(pattern="^[-]{0,1}(([0-9]*\\.){0,1}[0-9]+|[a-zA-Z])$", x=_)
+parse$is.symb <- function ( item ) item |> grepl(pattern="^[-]{0,1}[a-zA-Z]$", x=_)
 
 operator[["+"]]       <- list()
 operator[["+"]]$n     <- 2
@@ -100,55 +107,38 @@ operator[["~"]]$infix <- function ( opt, out ) {
   list(out=out, opt="~")
 }
 
-parse         <- list()
-parse$split   <- function ( command ) strsplit(command,split=" +")[[1]]
-parse$is.neg  <- function ( str  ) substr(str,start=1,stop=1)=="-"
-parse$is.optr <- function ( item ) item %in% names(operator)
-parse$is.opnd <- function ( item ) item |> grepl(pattern="^[-]{0,1}(([0-9]*\\.){0,1}[0-9]+|[a-zA-Z])$", x=_)
-parse$is.symb <- function ( item ) item |> grepl(pattern="^[-]{0,1}[a-zA-Z]$", x=_)
-
 ### Main Functions ############################################################
 
-to.infix <- function ( command ) {
+main <- function ( command ) {
+  command <- gsub(pattern="(^\\s+|\\s+$)",replacement="",x=command)
+  stack.val <- Stack()
   stack.out <- Stack()
   stack.opt <- Stack()
   for ( item in parse$split(command) ) {
     if ( parse$is.opnd(item) ) {
+      stack.val$push( item )
       stack.out$push( item )
       stack.opt$push( ifelse(parse$is.symb(item),"a","1") )
       next
     } else if ( parse$is.optr(item) ) {
-      if ( stack.out$length < operator[[item]]$n )
-        return(paste("ERROR: Not enough operands for", paste0('"',item,'"')))
+      if ( stack.val$length < operator[[item]]$n ) {
+        mess <- paste("ERROR: Not enough operands for", paste0('"',item,'"'))
+        return(list(val=mess,inf=mess))
+      }
+      opd <- stack.val$pop(operator[[item]]$n)
       out <- stack.out$pop(operator[[item]]$n)
       opt <- stack.opt$pop(operator[[item]]$n)
-      output <- operator[[item]]$infix(opt,out)
-      stack.out$push(output$out)
-      stack.opt$push(output$opt)
+      out.v <- operator[[item]]$eval(opd)
+      out.i <- operator[[item]]$infix(opt,out)
+      stack.val$push(out.v)
+      stack.out$push(out.i$out)
+      stack.opt$push(out.i$opt)
       next
     }
-    return(paste("ERROR: Input", paste0('"',item,'"'), "is not a legal command")) 
+    mess <- paste("ERROR: Input", paste0('"',item,'"'), "is not a legal command")
+    return(list(val=mess,inf=mess))
   }
-  return(stack.out$values)
-}
-
-evaluate <- function ( command ) {
- stack <- Stack()
-  for ( item in parse$split(command) ) {
-    if ( parse$is.opnd(item) ) {
-      stack$push( item )
-      next
-    } else if ( parse$is.optr(item) ) {
-      if ( stack$length < operator[[item]]$n )
-        return(paste("ERROR: Not enough operands for", paste0('"',item,'"')))
-      opnds <- stack$pop(operator[[item]]$n)
-      output <- operator[[item]]$eval(opnds)
-      stack$push(output)
-      next
-    }
-    return(paste("ERROR: Input", paste0('"',item,'"'), "is not a legal command"))
-  }
-  return(stack$values)
+  return(list(val=stack.val$values, inf=stack.out$values))
 }
 
 ### Shiny #####################################################################
@@ -156,24 +146,23 @@ evaluate <- function ( command ) {
 style.sheet <- "width: auto; max-width: 55em; margin: 0 auto; font-family: monospace;"
 
 ui <- fluidPage(includeCSS("www/style.css"),
-                verticalLayout(div(style=style.sheet,
-                                   withMathJax(),
+                verticalLayout(div(style=style.sheet, withMathJax(),
                                    h3(strong("RPN Calculator")),br(),
                                    textInput(inputId="command", label="Input Command"),
-                                   strong("Output (Stack):"), textOutput("stack"),
-                                   strong("Infix Notation:"), uiOutput("infix"),
-                                   includeHTML("www/body.html")
+                                   uiOutput("result"), includeHTML("www/body.html")
                                    )))
 
 server <- function ( input, output ) {
-  output$stack <- renderText({
-    paste(evaluate(input$command),collapse=", ") |>
-      ( \ (x) if ( x=="" ) "\u200B" else x )()
-  })
-  output$infix <- renderUI({
-    x <- paste(to.infix(input$command),collapse=", ")
-    x <- if ( x=="" ) "\u200B" else if ( grepl("ERROR",x) ) x else paste0("\\[",x,"\\]")
-    withMathJax(x)
+  output$result <- renderUI({
+    res <- main(input$command) |> lapply( \ (x) paste(x,collapse=", ") )
+    if ( res$val == "" ) res$val <- "\u200B"
+    if ( res$inf == "" ) {
+      res$inf <- "\u200B"
+    } else if ( !grepl("ERROR",res$inf ) ) {
+      res$inf <- paste0("\\[",res$inf,"\\]")
+    }
+    withMathJax(strong("Output (Stack):"),br(),res$val,br(),
+                strong("Infix Notation:"),br(),res$inf)
   })
 }
 

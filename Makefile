@@ -1,9 +1,15 @@
-.PHONY: all clean
+.PHONY: all clean shinylive shinyapps
 
-all: docs
+all:
+	# Specify 'shinylive' or 'shinyapps'
 
 clean:
 	rm -rf docs
 
-docs: reverse-polish/ makeapp.R
-	Rscript makeapp.R
+shinylive: reverse-polish/ makeapp.R
+	cd reverse-polish; make ; cd ..
+	Rscript makeapp.R $@
+
+shinyapps: reverse-polish/ makeapp.R
+	cd reverse-polish; make ; cd ..
+	Rscript makeapp.R $@

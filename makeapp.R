@@ -1,9 +1,20 @@
 #!/usr/bin/env Rscript
 
-# library(shiny)
-# library(shinylive)
-# shinylive::export("reverse-polish/", "docs")
-# httpuv::runStaticServer("docs")
+args <- commandArgs(trailingOnly=TRUE)
 
-library(rsconnect)
-rsconnect::deployApp("reverse-polish/")
+if ( length(args)!=1 ) stop("Specify 'shinylive' or 'shinyapps'.")
+
+if ( args=="shinylive" ) {
+  library(shiny)
+  library(shinylive)
+  shinylive::export("reverse-polish/", "docs")
+  quit()
+}
+
+if ( args=="shinyapps" ) {
+  library(rsconnect)
+  rsconnect::deployApp("reverse-polish/")
+  quit()
+}
+
+stop("Specify 'shinylive' or 'shinyapps'.")
