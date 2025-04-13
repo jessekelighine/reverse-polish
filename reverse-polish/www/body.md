@@ -33,13 +33,13 @@ and the numeric result will be marked as `NA`.
 
 💡 **Tip**: Copy any example and paste it into the input box to test it!
 
-| RPN Input                              | Output (Stack) | Infix Notation                                      |
-| ---                                    | ---            | ---                                                 |
-| `2 3 + 4 -`                            | `1`            | $2 + 3 - 4$                                         |
-| `1 2 3 - - ~`                          | `-2`           | $-(1 - (2 - 3))$                                    |
-| `27 1 3 / ^`                           | `3`            | $27^{\frac13}$                                      |
-| `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`           | `5`            | $\sqrt{(4 - 1)^2 + (8 - 4)^2}$                      |
-| `-b b 2 ^ 4 a c * * - sqrt + 2 a * /`  | `NA`           | $\frac{-b + \sqrt{b^2-4\cdot a\cdot c}}{2\cdot a}$  |
+| RPN Input                              | Infix Notation                                      | Output (Stack) |
+| ---                                    | ---                                                 | ---            |
+| `2 3 + 4 -`                            | $2 + 3 - 4$                                         | `1`            |
+| `1 2 3 - - ~`                          | $-(1 - (2 - 3))$                                    | `-2`           |
+| `27 1 3 / ^`                           | $27^{\frac13}$                                      | `3`            |
+| `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`           | $\sqrt{(4 - 1)^2 + (8 - 4)^2}$                      | `5`            |
+| `-b b 2 ^ 4 a c * * - sqrt + 2 a * /`  | $\frac{-b + \sqrt{b^2-4\cdot a\cdot c}}{2\cdot a}$  | `NA`           |
 
 ---
 
