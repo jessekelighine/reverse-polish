@@ -214,7 +214,7 @@ ui <- fluidPage(
         )
       ),
       br(),
-      textInput(inputId = "command", label = "RPN Input"),
+      textInput(inputId = "command", label = "RPN Input", width = "55em"),
       uiOutput("result"),
       includeHTML("www/body.html")
     )

@@ -12,11 +12,11 @@ body {
 
 table {
 	margin: 0 auto;
-	/* padding: 10px; */
-	border-collapse: collapse;
+	table-layout: auto;
 }
 
 tr {
+	white-space: nowrap;
 	border-bottom: 1px solid #666666;
 }
 
