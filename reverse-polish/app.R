@@ -191,8 +191,7 @@ main <- function(command) {
 style_sheet <- paste(
   "width: auto;",
   "max-width: 55em;",
-  "margin: 0 auto;",
-  "font-family: monospace;"
+  "margin: 0 auto;"
 )
 
 ui <- fluidPage(

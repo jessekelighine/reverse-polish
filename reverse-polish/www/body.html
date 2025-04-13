@@ -1,9 +1,12 @@
 <hr />
 <h4 id="usage">Usage</h4>
 <p>Enter an expression in Reverse Polish Notation (RPN) to see its
-result and corresponding infix notation.</p>
-<p><strong>Note</strong>: Make sure to separate each operand and
-operator with a space. Scroll down for usage examples.</p>
+result and corresponding infix notation. Make sure to separate each
+operand and operator with a space. Scroll down for usage examples.</p>
+<p>🤔 <strong>Not familiar with RPN?</strong> Check out the <a
+href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">Wikipedia
+article</a> or watch the excellent explainer by <a
+href="https://www.youtube.com/watch?v=7ha78yWRDlE">Computerphile</a>.</p>
 <h4 id="available-operators">Available Operators</h4>
 <ul>
 <li><code>+</code> <strong>ADD</strong>: <em>add</em> the last two
@@ -26,56 +29,53 @@ number on stack.</li>
 the last two number on stack.</li>
 </ul>
 <h4 id="available-operands">Available Operands</h4>
-<ul>
-<li>You can use numbers or letters as <em>variables</em> (<code>a</code>
-to <code>z</code> and <code>A</code> to <code>Z</code>).</li>
-<li>If <em>variables</em> are used, the output will show a symbolic
-infix expression, and the numeric result will be marked as
-<code>NA</code>.</li>
-</ul>
+<p>You can use numbers or letters <code>a</code> to <code>z</code> as
+operands. If letters are used, the output will show a symbolic infix
+expression, and the numeric result will be marked as
+<code>NA</code>.</p>
 <h4 id="examples">Examples</h4>
-<p>Each example includes the RPN input, the translated infix expression,
-and the evaluated output.</p>
-<p><strong>Tip</strong>: Copy any example and paste it into the input
+<p>💡 <strong>Tip</strong>: Copy any example and paste it into the input
 box to test it!</p>
-<table style="width:100%;">
+<table>
 <colgroup>
-<col style="width: 43%" />
-<col style="width: 34%" />
-<col style="width: 21%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
 </colgroup>
 <thead>
 <tr>
-<th>RPN</th>
-<th><strong>Infix Notation</strong></th>
-<th><strong>Output (Stack)</strong></th>
+<th>RPN Input</th>
+<th>Output (Stack)</th>
+<th>Infix Notation</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>2 3 + 4 -</code> </td>
-<td><code>2 + 3 - 4</code> </td>
 <td><code>1</code></td>
+<td><span class="math inline">\(2 + 3 - 4\)</span> </td>
 </tr>
 <tr>
 <td><code>1 2 3 - - ~</code> </td>
-<td><code>-(1 - (2 - 3))</code> </td>
 <td><code>-2</code></td>
+<td><span class="math inline">\(-(1 - (2 - 3))\)</span> </td>
 </tr>
 <tr>
 <td><code>27 1 3 / ^</code> </td>
-<td><code>27^(1/3)</code> </td>
 <td><code>3</code></td>
+<td><span class="math inline">\(27^{\frac13}\)</span> </td>
 </tr>
 <tr>
 <td><code>4 1 - 2 ^ 8 4 - 2 ^ + sqrt</code> </td>
-<td><code>sqrt((4 - 1)^2 + (8 - 4)^2)</code> </td>
 <td><code>5</code></td>
+<td><span class="math inline">\(\sqrt{(4 - 1)^2 + (8 -
+4)^2}\)</span> </td>
 </tr>
 <tr>
 <td><code>-b b 2 ^ 4 a c * * - sqrt + 2 a * /</code> </td>
-<td><code>(-b + sqrt(b^2-4ac))/(2a)</code> </td>
 <td><code>NA</code></td>
+<td><span class="math inline">\(\frac{-b + \sqrt{b^2-4\cdot a\cdot
+c}}{2\cdot a}\)</span> </td>
 </tr>
 </tbody>
 </table>

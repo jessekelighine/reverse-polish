@@ -4,8 +4,11 @@
 #### Usage
 
 Enter an expression in Reverse Polish Notation (RPN) to see its result and corresponding infix notation.
+Make sure to separate each operand and operator with a space. Scroll down for usage examples.
 
-**Note**: Make sure to separate each operand and operator with a space. Scroll down for usage examples.
+🤔 **Not familiar with RPN?**
+Check out the [Wikipedia article](https://en.wikipedia.org/wiki/Reverse_Polish_notation)
+or watch the excellent explainer by [Computerphile](https://www.youtube.com/watch?v=7ha78yWRDlE).
 
 #### Available Operators
 
@@ -21,24 +24,22 @@ Enter an expression in Reverse Polish Notation (RPN) to see its result and corre
 
 #### Available Operands
 
-- You can use numbers or letters as *variables* (`a` to `z` and `A` to `Z`).
-- If *variables* are used,
-  the output will show a symbolic infix expression,
-  and the numeric result will be marked as `NA`.
+You can use numbers or letters `a` to `z` as operands.
+If letters are used,
+the output will show a symbolic infix expression,
+and the numeric result will be marked as `NA`.
 
 #### Examples
 
-Each example includes the RPN input, the translated infix expression, and the evaluated output.
+💡 **Tip**: Copy any example and paste it into the input box to test it!
 
-**Tip**: Copy any example and paste it into the input box to test it!
-
-| RPN                                    | **Infix Notation**             | **Output (Stack)** |
-|----------------------------------------|--------------------------------|--------------------|
-| `2 3 + 4 -`                            | `2 + 3 - 4`                    | `1`                |
-| `1 2 3 - - ~`                          | `-(1 - (2 - 3))`               | `-2`               |
-| `27 1 3 / ^`                           | `27^(1/3)`                     | `3`                |
-| `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`           | `sqrt((4 - 1)^2 + (8 - 4)^2)`  | `5`                |
-| `-b b 2 ^ 4 a c * * - sqrt + 2 a * /`  | `(-b + sqrt(b^2-4ac))/(2a)`    | `NA`               |
+| RPN Input                              | Output (Stack) | Infix Notation                                      |
+| ---                                    | ---            | ---                                                 |
+| `2 3 + 4 -`                            | `1`            | $2 + 3 - 4$                                         |
+| `1 2 3 - - ~`                          | `-2`           | $-(1 - (2 - 3))$                                    |
+| `27 1 3 / ^`                           | `3`            | $27^{\frac13}$                                      |
+| `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`           | `5`            | $\sqrt{(4 - 1)^2 + (8 - 4)^2}$                      |
+| `-b b 2 ^ 4 a c * * - sqrt + 2 a * /`  | `NA`           | $\frac{-b + \sqrt{b^2-4\cdot a\cdot c}}{2\cdot a}$  |
 
 ---
 
