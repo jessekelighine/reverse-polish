@@ -7,7 +7,7 @@ if (length(args) != 1) stop("Specify 'shinylive' or 'shinyapps'.")
 if (args == "shinylive") {
   library(shiny)
   library(shinylive)
-  shinylive::export("reverse-polish/", "docs")
+  shinylive::export(appdir = "reverse-polish/", destdir = "docs")
   quit()
 }
 
