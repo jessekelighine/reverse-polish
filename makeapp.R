@@ -1,18 +1,20 @@
 #!/usr/bin/env Rscript
 
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
-if ( length(args)!=1 ) stop("Specify 'shinylive' or 'shinyapps'.")
+if (length(args) != 1) stop("Specify 'shinylive' or 'shinyapps'.")
 
-if ( args=="shinylive" ) {
+if (args == "shinylive") {
   library(shiny)
   library(shinylive)
   shinylive::export("reverse-polish/", "docs")
   quit()
 }
 
-if ( args=="shinyapps" ) {
+if (args == "shinyapps") {
   library(rsconnect)
+  # Get these information from `https://shinyapps.io`
+  rsconnect::setAccountInfo(name = "", token = "", secret = "")
   rsconnect::deployApp("reverse-polish/")
   quit()
 }

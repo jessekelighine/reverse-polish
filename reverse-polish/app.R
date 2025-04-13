@@ -5,154 +5,243 @@
 # Author: Jesse C. Chen (website: jessekelighine.com)                         #
 # Description: Reverse Polish Notation                                        #
 #                                                                             #
-# Last Modified: 2023-12-20                                                   #
+# Last Modified: 2025-04-13                                                   #
 ###############################################################################
 library(shiny)
 library(fastmap)
 ###############################################################################
 
-### Operators & Parsing #######################################################
-
 operator <- list()
-parse    <- list()
+parse <- list()
 
-parse$split   <- function ( command ) strsplit(command,split=" +")[[1]]
-parse$is.neg  <- function ( str  ) substr(str,start=1,stop=1)=="-"
-parse$is.optr <- function ( item ) item %in% names(operator)
-parse$is.opnd <- function ( item ) item |> grepl(pattern="^[-]{0,1}(([0-9]*\\.){0,1}[0-9]+|[a-zA-Z])$", x=_)
-parse$is.symb <- function ( item ) item |> grepl(pattern="^[-]{0,1}[a-zA-Z]$", x=_)
+## Parsing ####################################################################
 
-operator[["+"]]       <- list()
-operator[["+"]]$n     <- 2
-operator[["+"]]$eval  <- function ( opnds ) as.numeric(opnds[1]) + as.numeric(opnds[2])
-operator[["+"]]$infix <- function ( opt, out ) {
-  if ( parse$is.neg(out[2]) ) out[2] <- paste0("\\left(",out[2],"\\right)")
-  list(out=paste(out[1],"+",out[2]), opt="+")
+parse$split <- function(command) strsplit(command, split = " +")[[1]]
+
+parse$is_negative <- function(str) substr(str, start = 1, stop = 1) == "-"
+
+parse$is_operator <- function(item) item %in% names(operator)
+
+parse$is_operand <- function(item) {
+  grepl(
+    pattern = "^[-]{0,1}(([0-9]*\\.){0,1}[0-9]+|[a-zA-Z])$",
+    x = item
+  )
 }
 
-operator[["-"]]       <- list()
-operator[["-"]]$n     <- 2
-operator[["-"]]$eval  <- function ( opnds ) as.numeric(opnds[1]) - as.numeric(opnds[2])
-operator[["-"]]$infix <- function ( opt, out ) {
-  if ( parse$is.neg(out[2]) | opt[2] %in% c("+","-") ) out[2] <- paste0("\\left(",out[2],"\\right)")
-  list(out=paste(out[1],"-",out[2]), opt="-")
+parse$is_symbolic <- function(item) {
+  grepl(pattern = "^[-]{0,1}[a-zA-Z]$", x = item)
 }
 
-operator[["*"]]       <- list()
-operator[["*"]]$n     <- 2
-operator[["*"]]$eval  <- function ( opnds ) as.numeric(opnds[1]) * as.numeric(opnds[2])
-operator[["*"]]$infix <- function ( opt, out ) {
-  temp <- parse$is.neg(out[2])
-  if ( opt[1] %in% c("+","-") ) out[1] <- paste0("\\left(",out[1],"\\right)")
-  if ( temp | opt[2] %in% c("+","-") ) out[2] <- paste0("\\left(",out[2],"\\right)")
-  temp <- if ( opt[1]=="1" & opt[2]=="a" & !temp ) paste(out[1],out[2]) else paste(out[1],"\\cdot",out[2])
-  list(out=temp,opt="*")
+## Operators ##################################################################
+
+operator[["+"]] <- list()
+operator[["+"]]$n <- 2
+operator[["+"]]$eval <- function(operand) {
+  as.numeric(operand[1]) + as.numeric(operand[2])
 }
-
-operator[["/"]]       <- list()
-operator[["/"]]$n     <- 2
-operator[["/"]]$eval  <- function ( opnds ) as.numeric(opnds[1]) / as.numeric(opnds[2])
-operator[["/"]]$infix <- function ( opt, out ) {
-  list(out=paste("\\frac{",out[1],"}{",out[2],"}"), opt="/")
-}
-
-operator[["^"]]       <- list()
-operator[["^"]]$n     <- 2
-operator[["^"]]$eval  <- function ( opnds ) as.numeric(opnds[1]) ^ as.numeric(opnds[2])
-operator[["^"]]$infix <- function ( opt, out ) {
-  if ( parse$is.neg(out[1]) | ! parse$is.opnd(out[1]) ) out[1] <- paste0("\\left(",out[1],"\\right)")
-  list(out=paste0(out[1],"^{",out[2],"}"), opt="^")
-}
-
-operator[["!"]]       <- list()
-operator[["!"]]$n     <- 1
-operator[["!"]]$eval  <- function ( opnds ) factorial(as.numeric(opnds))
-operator[["!"]]$infix <- function ( opt, out ) {
-  temp <- if ( parse$is.neg(out) | ! parse$is.opnd(opt) ) paste0("\\left(",out,"\\right)!") else paste0(out,"!")
-  list(out=temp, opt="!")
-}
-
-operator[["sqrt"]]       <- list()
-operator[["sqrt"]]$n     <- 1
-operator[["sqrt"]]$eval  <- function ( opnds ) sqrt(as.numeric(opnds))
-operator[["sqrt"]]$infix <- function ( opt, out ) {
-  list(out=paste0("\\sqrt{",out,"}"), opt="sqrt")
-}
-
-operator[["|"]]       <- list()
-operator[["|"]]$n     <- 2
-operator[["|"]]$eval  <- function ( opnds ) c(as.numeric(opnds[2]), as.numeric(opnds[1]))
-operator[["|"]]$infix <- function ( opt, out ) {
-  list(out=out[2:1], opt=opt[2:1])
-}
-
-operator[["~"]]       <- list()
-operator[["~"]]$n     <- 1
-operator[["~"]]$eval  <- function ( opnds ) -as.numeric(opnds)
-operator[["~"]]$infix <- function ( opt, out ) {
-  temp.neg <- parse$is.neg(out)
-  out <- if ( parse$is.neg(out) | opt %in% c("+","-") ) paste0("-\\left(",out,"\\right)") else paste0("-",out)
-  list(out=out, opt="~")
-}
-
-### Main Functions ############################################################
-
-main <- function ( command ) {
-  command <- gsub(pattern="(^\\s+|\\s+$)",replacement="",x=command)
-  stack.val <- faststack()
-  stack.out <- faststack()
-  stack.opt <- faststack()
-  for ( item in parse$split(command) ) {
-    if ( parse$is.opnd(item) ) {
-      stack.val$push( item )
-      stack.out$push( item )
-      stack.opt$push( ifelse(parse$is.symb(item),"a","1") )
-      next
-    } else if ( parse$is.optr(item) ) {
-      if ( stack.val$size() < operator[[item]]$n ) {
-        mess <- paste("ERROR: Not enough operands for", paste0('"',item,'"'))
-        return(list(val=mess,inf=mess))
-      }
-      opd <- stack.val$mpop(operator[[item]]$n) |> unlist() |> rev()
-      out <- stack.out$mpop(operator[[item]]$n) |> unlist() |> rev()
-      opt <- stack.opt$mpop(operator[[item]]$n) |> unlist() |> rev()
-      out.v <- operator[[item]]$eval(opd)
-      out.i <- operator[[item]]$infix(opt,out)
-      stack.val$mpush(.list = as.list(out.v))
-      stack.out$mpush(.list = as.list(out.i$out))
-      stack.opt$mpush(.list = as.list(out.i$opt))
-      next
-    }
-    mess <- paste("ERROR: Input", paste0('"',item,'"'), "is not a legal command")
-    return(list(val=mess,inf=mess))
+operator[["+"]]$infix <- function(operator, infix) {
+  if (parse$is_negative(infix[2])) {
+    infix[2] <- paste0("\\left(", infix[2], "\\right)")
   }
-  return(list(val = stack.val$as_list() |> unlist(),
-              inf = stack.out$as_list() |> unlist()))
+  list(infix = paste(infix[1], "+", infix[2]), operator = "+")
 }
 
-### Shiny #####################################################################
+operator[["-"]] <- list()
+operator[["-"]]$n <- 2
+operator[["-"]]$eval <- function(operand) {
+  as.numeric(operand[1]) - as.numeric(operand[2])
+}
+operator[["-"]]$infix <- function(operator, infix) {
+  if (parse$is_negative(infix[2]) || operator[2] %in% c("+", "-")) {
+    infix[2] <- paste0("\\left(", infix[2], "\\right)")
+  }
+  list(infix = paste(infix[1], "-", infix[2]), operator = "-")
+}
 
-style.sheet <- "width: auto; max-width: 55em; margin: 0 auto; font-family: monospace;"
+operator[["*"]] <- list()
+operator[["*"]]$n <- 2
+operator[["*"]]$eval <- function(operand) {
+  as.numeric(operand[1]) * as.numeric(operand[2])
+}
+operator[["*"]]$infix <- function(operator, infix) {
+  if (operator[1] %in% c("+", "-")) {
+    infix[1] <- paste0("\\left(", infix[1], "\\right)")
+  }
+  if (parse$is_negative(infix[2]) || operator[2] %in% c("+", "-")) {
+    infix[2] <- paste0("\\left(", infix[2], "\\right)")
+  }
+  list(infix = paste(infix[1], "\\cdot", infix[2]), operator = "*")
+}
 
-ui <- fluidPage(includeCSS("www/style.css"),
-                verticalLayout(div(style=style.sheet, withMathJax(),
-                                   h3(strong("RPN Calculator")),br(),
-                                   textInput(inputId="command", label="Input Command"),
-                                   uiOutput("result"), includeHTML("www/body.html")
-                                   )))
+operator[["/"]] <- list()
+operator[["/"]]$n <- 2
+operator[["/"]]$eval <- function(operand) {
+  as.numeric(operand[1]) / as.numeric(operand[2])
+}
+operator[["/"]]$infix <- function(operator, infix) {
+  list(
+    infix = paste("\\frac{", infix[1], "}{", infix[2], "}"),
+    operator = "/"
+  )
+}
 
-server <- function ( input, output ) {
-  output$result <- renderUI({
-    res <- main(input$command) |> lapply( \ (x) paste(x,collapse=", ") )
-    if ( res$val == "" ) res$val <- "\u200B"
-    if ( res$inf == "" ) {
-      res$inf <- "\u200B"
-    } else if ( !grepl("ERROR",res$inf ) ) {
-      res$inf <- paste0("\\[",res$inf,"\\]")
+operator[["^"]] <- list()
+operator[["^"]]$n <- 2
+operator[["^"]]$eval <- function(operand) {
+  as.numeric(operand[1])^as.numeric(operand[2])
+}
+operator[["^"]]$infix <- function(operator, infix) {
+  if (parse$is_negative(infix[1]) || !parse$is_operand(infix[1])) {
+    infix[1] <- paste0("\\left(", infix[1], "\\right)")
+  }
+  infix_output <- paste0(infix[1], "^{", infix[2], "}")
+  list(infix = infix_output, operator = "^")
+}
+
+operator[["!"]] <- list()
+operator[["!"]]$n <- 1
+operator[["!"]]$eval <- function(operand) factorial(as.numeric(operand))
+operator[["!"]]$infix <- function(operator, infix) {
+  infix_output <- if (parse$is_negative(infix) || !parse$is_operand(operator)) {
+    paste0("\\left(", infix, "\\right)!")
+  } else {
+    paste0(infix, "!")
+  }
+  list(infix = infix_output, operator = "!")
+}
+
+operator[["sqrt"]] <- list()
+operator[["sqrt"]]$n <- 1
+operator[["sqrt"]]$eval <- function(operand) sqrt(as.numeric(operand))
+operator[["sqrt"]]$infix <- function(operator, infix) {
+  infix_output <- paste0("\\sqrt{", infix, "}")
+  list(infix = infix_output, operator = "sqrt")
+}
+
+operator[["|"]] <- list()
+operator[["|"]]$n <- 2
+operator[["|"]]$eval <- function(operand) {
+  c(as.numeric(operand[2]), as.numeric(operand[1]))
+}
+operator[["|"]]$infix <- function(operator, infix) {
+  list(infix = infix[2:1], operator = operator[2:1])
+}
+
+operator[["~"]] <- list()
+operator[["~"]]$n <- 1
+operator[["~"]]$eval <- function(operand) -as.numeric(operand)
+operator[["~"]]$infix <- function(operator, infix) {
+  infix_output <- if (parse$is_negative(infix) || operator %in% c("+", "-")) {
+    paste0("-\\left(", infix, "\\right)")
+  } else {
+    paste0("-", infix)
+  }
+  list(infix = infix_output, operator = "~")
+}
+
+## Main Functions #############################################################
+
+main <- function(command) {
+  command <- gsub(pattern = "(^\\s+|\\s+$)", replacement = "", x = command)
+  stack <- list()
+  stack$value <- faststack()
+  stack$infix <- faststack()
+  stack$operator <- faststack()
+  for (item in parse$split(command)) {
+    if (parse$is_operand(item)) {
+      stack$value$push(item)
+      stack$infix$push(item)
+      stack$operator$push("atom")
+      next
     }
-    withMathJax(strong("Output (Stack):"),br(),res$val,br(),
-                strong("Infix Notation:"),br(),res$inf)
+    if (parse$is_operator(item)) {
+      if (stack$value$size() < operator[[item]]$n) {
+        error_message <- paste(
+          "ERROR: Not enough operands for",
+          paste0('"', item, '"')
+        )
+        return(list(value = error_message, infix = error_message))
+      }
+      operand <- stack$value$mpop(operator[[item]]$n) |> unlist() |> rev()
+      infix <- stack$infix$mpop(operator[[item]]$n) |> unlist() |> rev()
+      operators <- stack$operator$mpop(operator[[item]]$n) |> unlist() |> rev()
+      output_value <- operator[[item]]$eval(operand)
+      output_infix <- operator[[item]]$infix(operators, infix)
+      stack$value$mpush(.list = as.list(output_value))
+      stack$infix$mpush(.list = as.list(output_infix$infix))
+      stack$operator$mpush(.list = as.list(output_infix$operator))
+      next
+    }
+    error_message <- paste(
+      "ERROR: Input",
+      paste0('"', item, '"'),
+      "is not a legal command"
+    )
+    return(list(value = error_message, infix = error_message))
+  }
+  return(list(
+    value = stack$value$as_list() |> unlist(),
+    infix = stack$infix$as_list() |> unlist()
+  ))
+}
+
+## Shiny ######################################################################
+
+style_sheet <- paste(
+  "width: auto;",
+  "max-width: 55em;",
+  "margin: 0 auto;",
+  "font-family: monospace;"
+)
+
+ui <- fluidPage(
+  includeCSS("www/style.css"),
+  verticalLayout(
+    div(
+      style = style_sheet,
+      withMathJax(),
+      h3(strong("Reverse Polish Notation Calculator")),
+      shiny::HTML(
+        paste(
+          "<p>",
+          "Created by Jesse C. Chen",
+          paste0(
+            "(",
+            "<a href='https://jessekelighine.com'>jessekelighine.com</a>",
+            ")"
+          ),
+          "</p>"
+        )
+      ),
+      br(),
+      textInput(inputId = "command", label = "RPN Input"),
+      uiOutput("result"),
+      includeHTML("www/body.html")
+    )
+  )
+)
+
+server <- function(input, output) {
+  output$result <- renderUI({
+    result <- main(input$command) |> lapply(\(x) paste(x, collapse = ", "))
+    zero_width_space <- "\u200B"
+    if (result$value == "") result$value <- zero_width_space
+    if (result$infix == "") {
+      result$infix <- zero_width_space
+    } else if (!grepl("ERROR", result$infix)) {
+      result$infix <- paste0("\\[", result$infix, "\\]")
+    }
+    withMathJax(
+      strong("Output (Stack):"),
+      br(),
+      result$value,
+      br(),
+      strong("Infix Notation:"),
+      br(),
+      result$infix
+    )
   })
 }
 
-shinyApp(ui=ui, server=server)
+shinyApp(ui = ui, server = server)

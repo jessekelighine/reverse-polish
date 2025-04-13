@@ -3,9 +3,9 @@
 
 #### Usage
 
-Input a command in reverse-polish notation (RPN) and see the output and infix notation representation!
+Enter an expression in Reverse Polish Notation (RPN) to see its result and corresponding infix notation.
 
-**Note**: Separate the operators/operands with spaces. You can find examples at the end of this page. 
+**Note**: Make sure to separate each operand and operator with a space. Scroll down for usage examples.
 
 #### Available Operators
 
@@ -21,18 +21,16 @@ Input a command in reverse-polish notation (RPN) and see the output and infix no
 
 #### Available Operands
 
-- Apart from numbers, you can use the single alphabets, i.e., `a` to `z`, as operands.
-- If alphabets are used as operands, then a *symbolic* **Infix Notation** is calculated,
-  and the *numeric* **Output (Stack)** will be `NA`.
+- You can use numbers or letters as *variables* (`a` to `z` and `A` to `Z`).
+- If *variables* are used,
+  the output will show a symbolic infix expression,
+  and the numeric result will be marked as `NA`.
 
 #### Examples
 
-The following are some examples:
-first in RPN,
-then in infix notation,
-then the output.
+Each example includes the RPN input, the translated infix expression, and the evaluated output.
 
-**Tip**: Copy the RPN in the input and verify that the output is correct!
+**Tip**: Copy any example and paste it into the input box to test it!
 
 | RPN                                    | **Infix Notation**             | **Output (Stack)** |
 |----------------------------------------|--------------------------------|--------------------|
@@ -44,6 +42,6 @@ then the output.
 
 ---
 
-Author: Jesse C. Chen ([jessekelighine.com](https://jessekelighine.com))
+Created by Jesse C. Chen ([jessekelighine.com](https://jessekelighine.com))
 <br>
 <br>

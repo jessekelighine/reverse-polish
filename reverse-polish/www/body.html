@@ -1,9 +1,9 @@
 <hr />
 <h4 id="usage">Usage</h4>
-<p>Input a command in reverse-polish notation (RPN) and see the output
-and infix notation representation!</p>
-<p><strong>Note</strong>: Separate the operators/operands with spaces.
-You can find examples at the end of this page.</p>
+<p>Enter an expression in Reverse Polish Notation (RPN) to see its
+result and corresponding infix notation.</p>
+<p><strong>Note</strong>: Make sure to separate each operand and
+operator with a space. Scroll down for usage examples.</p>
 <h4 id="available-operators">Available Operators</h4>
 <ul>
 <li><code>+</code> <strong>ADD</strong>: <em>add</em> the last two
@@ -27,17 +27,17 @@ the last two number on stack.</li>
 </ul>
 <h4 id="available-operands">Available Operands</h4>
 <ul>
-<li>Apart from numbers, you can use the single alphabets, i.e.,
-<code>a</code> to <code>z</code>, as operands.</li>
-<li>If alphabets are used as operands, then a <em>symbolic</em>
-<strong>Infix Notation</strong> is calculated, and the <em>numeric</em>
-<strong>Output (Stack)</strong> will be <code>NA</code>.</li>
+<li>You can use numbers or letters as <em>variables</em> (<code>a</code>
+to <code>z</code> and <code>A</code> to <code>Z</code>).</li>
+<li>If <em>variables</em> are used, the output will show a symbolic
+infix expression, and the numeric result will be marked as
+<code>NA</code>.</li>
 </ul>
 <h4 id="examples">Examples</h4>
-<p>The following are some examples: first in RPN, then in infix
-notation, then the output.</p>
-<p><strong>Tip</strong>: Copy the RPN in the input and verify that the
-output is correct!</p>
+<p>Each example includes the RPN input, the translated infix expression,
+and the evaluated output.</p>
+<p><strong>Tip</strong>: Copy any example and paste it into the input
+box to test it!</p>
 <table style="width:100%;">
 <colgroup>
 <col style="width: 43%" />
@@ -45,34 +45,34 @@ output is correct!</p>
 <col style="width: 21%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>RPN</th>
 <th><strong>Infix Notation</strong></th>
 <th><strong>Output (Stack)</strong></th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>2 3 + 4 -</code> </td>
 <td><code>2 + 3 - 4</code> </td>
 <td><code>1</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>1 2 3 - - ~</code> </td>
 <td><code>-(1 - (2 - 3))</code> </td>
 <td><code>-2</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>27 1 3 / ^</code> </td>
 <td><code>27^(1/3)</code> </td>
 <td><code>3</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>4 1 - 2 ^ 8 4 - 2 ^ + sqrt</code> </td>
 <td><code>sqrt((4 - 1)^2 + (8 - 4)^2)</code> </td>
 <td><code>5</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>-b b 2 ^ 4 a c * * - sqrt + 2 a * /</code> </td>
 <td><code>(-b + sqrt(b^2-4ac))/(2a)</code> </td>
 <td><code>NA</code></td>
@@ -80,5 +80,5 @@ output is correct!</p>
 </tbody>
 </table>
 <hr />
-<p>Author: Jesse C. Chen (<a
+<p>Created by Jesse C. Chen (<a
 href="https://jessekelighine.com">jessekelighine.com</a>) <br> <br></p>
