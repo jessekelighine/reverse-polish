@@ -8,6 +8,9 @@ href="https://en.wikipedia.org/wiki/Reverse_Polish_notation">Wikipedia
 article</a> or watch the excellent explainer by <a
 href="https://www.youtube.com/watch?v=7ha78yWRDlE">Computerphile</a>.</p>
 <h4 id="available-operators">Available Operators</h4>
+<p>There are two types of operators: <em>mathematical operators</em> and
+<em>stack operators</em>. Here are the <em>mathematical
+operators</em>:</p>
 <ul>
 <li><code>+</code> <strong>ADD</strong>: <em>add</em> the last two
 numbers on stack.</li>
@@ -27,8 +30,29 @@ number to the <em>power</em> of the last number on stack.</li>
 number on stack.</li>
 <li><code>sqrt</code> <strong>SQUARE ROOT</strong>: calculate the
 <em>square root</em> of the last number on stack.</li>
-<li><code>|</code> <strong>SWAP</strong>: <em>swap</em> the positions of
-the last two number on stack.</li>
+<li><code>abs</code> <strong>ABSOLUTE VALUE</strong>: calculate the
+<em>absolute value</em> of the last number on stack.</li>
+<li><code>log</code> <strong>LOGARITHM</strong>: calculate the
+<em>natural logarithm</em> of the last number on stack.</li>
+</ul>
+<p>And here are the <em>stack operators</em> that manipulate the
+stack:</p>
+<ul>
+<li><code>pop</code> <strong>POP</strong>: <em>pop</em>/remove the last
+number off the stack.</li>
+<li><code>dup</code> <strong>DUPLICATE</strong>: <em>duplicate</em> the
+last number on stack.</li>
+<li><code>swap</code> <strong>SWAP</strong>: <em>swap</em> the positions
+of the last two number on stack.</li>
+<li><code>roll</code> <strong>ROLL</strong>: syntax
+<code>n i roll</code> <em>rolls</em> the top <span
+class="math inline">\(n\)</span> elements on the stack around by a shift
+up of <span class="math inline">\(i\)</span> elements, so
+<code>2 1 roll</code> is equivalent to <code>swap</code>. Naturally,
+<span class="math inline">\(n\)</span> and <span
+class="math inline">\(i\)</span> must be (or will be coerced into)
+integers, and <span class="math inline">\(n\)</span> must be
+non-negative. See example below.</li>
 </ul>
 <h4 id="available-operands">Available Operands</h4>
 <p>You can use numbers or letters <code>a</code> to <code>z</code> as
@@ -46,35 +70,45 @@ box to test it!</p>
 <thead>
 <tr>
 <th>RPN Input</th>
-<th>Infix Notation</th>
 <th>Output (Stack)</th>
+<th>Infix Notation</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>2 3 + 4 -</code></td>
-<td><code>2 + 3 - 4</code></td>
 <td><code>1</code></td>
+<td><code>2 + 3 - 4</code></td>
 </tr>
 <tr>
 <td><code>1 2 3 - - ~</code></td>
-<td><code>-(1 - (2 - 3))</code></td>
 <td><code>-2</code></td>
+<td><code>-(1 - (2 - 3))</code></td>
 </tr>
 <tr>
 <td><code>27 1 3 / ^</code></td>
-<td><code>27^(1/3)</code></td>
 <td><code>3</code></td>
+<td><code>27^(1/3)</code></td>
 </tr>
 <tr>
 <td><code>4 1 - 2 ^ 8 4 - 2 ^ + sqrt</code></td>
-<td><code>sqrt((4 - 1)^2 + (8 - 4)^2)</code></td>
 <td><code>5</code></td>
+<td><code>sqrt((4 - 1)^2 + (8 - 4)^2)</code></td>
 </tr>
 <tr>
 <td><code>-b b 2 ^ 4 a c * * - sqrt + 2 a * /</code></td>
-<td><code>(-b + sqrt(b^2 - 4·a·c))/(2·a)</code></td>
 <td><code>NA</code></td>
+<td><code>(-b + sqrt(b^2 - 4·a·c))/(2·a)</code></td>
+</tr>
+<tr>
+<td><code>a b c d e 5 2 roll</code></td>
+<td><code>d, e, a, b, c</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>a b c d e 5 -1 roll</code></td>
+<td><code>b, c, d, e, a</code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
