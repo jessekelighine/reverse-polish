@@ -5,7 +5,7 @@
 # Author: Jesse C. Chen (website: jessekelighine.com)                         #
 # Description: Reverse Polish Notation                                        #
 #                                                                             #
-# Last Modified: 2025-04-13                                                   #
+# Last Modified: 2025-04-14                                                   #
 ###############################################################################
 library(shiny)
 library(fastmap)
@@ -83,6 +83,18 @@ operator[["/"]]$infix <- function(operator, infix) {
   list(
     infix = paste("\\frac{", infix[1], "}{", infix[2], "}"),
     operator = "/"
+  )
+}
+
+operator[["\\"]] <- list()
+operator[["\\"]]$n <- 2
+operator[["\\"]]$eval <- function(operand) {
+  as.numeric(operand[2]) / as.numeric(operand[1])
+}
+operator[["\\"]]$infix <- function(operator, infix) {
+  list(
+    infix = paste("\\frac{", infix[2], "}{", infix[1], "}"),
+    operator = "\\"
   )
 }
 

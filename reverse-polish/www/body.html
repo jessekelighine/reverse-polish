@@ -17,6 +17,8 @@ two numbers on stack.</li>
 two numbers on stack.</li>
 <li><code>/</code> <strong>DIVIDE</strong>: <em>divide</em> the last two
 numbers on stack.</li>
+<li><code>\</code> <strong>DIVIDE</strong>: <em>divide</em> the last two
+numbers on stack, but the other way around.</li>
 <li><code>^</code> <strong>POWER</strong>: raise the second-to-last
 number to the <em>power</em> of the last number on stack.</li>
 <li><code>!</code> <strong>FACTORIAL</strong>: calculate the
@@ -30,9 +32,8 @@ the last two number on stack.</li>
 </ul>
 <h4 id="available-operands">Available Operands</h4>
 <p>You can use numbers or letters <code>a</code> to <code>z</code> as
-operands. If letters are used, the output will show a symbolic infix
-expression, and the numeric result will be marked as
-<code>NA</code>.</p>
+operands. If letters are used, a symbolic infix expression will be
+calculated, and the numeric output will be <code>NA</code>.</p>
 <h4 id="examples">Examples</h4>
 <p>💡 <strong>Tip</strong>: Copy any example and paste it into the input
 box to test it!</p>
@@ -51,30 +52,28 @@ box to test it!</p>
 </thead>
 <tbody>
 <tr>
-<td><code>2 3 + 4 -</code> </td>
-<td><span class="math inline">\(2 + 3 - 4\)</span> </td>
+<td><code>2 3 + 4 -</code></td>
+<td><code>2 + 3 - 4</code></td>
 <td><code>1</code></td>
 </tr>
 <tr>
-<td><code>1 2 3 - - ~</code> </td>
-<td><span class="math inline">\(-(1 - (2 - 3))\)</span> </td>
+<td><code>1 2 3 - - ~</code></td>
+<td><code>-(1 - (2 - 3))</code></td>
 <td><code>-2</code></td>
 </tr>
 <tr>
-<td><code>27 1 3 / ^</code> </td>
-<td><span class="math inline">\(27^{\frac13}\)</span> </td>
+<td><code>27 1 3 / ^</code></td>
+<td><code>27^(1/3)</code></td>
 <td><code>3</code></td>
 </tr>
 <tr>
-<td><code>4 1 - 2 ^ 8 4 - 2 ^ + sqrt</code> </td>
-<td><span class="math inline">\(\sqrt{(4 - 1)^2 + (8 -
-4)^2}\)</span> </td>
+<td><code>4 1 - 2 ^ 8 4 - 2 ^ + sqrt</code></td>
+<td><code>sqrt((4 - 1)^2 + (8 - 4)^2)</code></td>
 <td><code>5</code></td>
 </tr>
 <tr>
-<td><code>-b b 2 ^ 4 a c * * - sqrt + 2 a * /</code> </td>
-<td><span class="math inline">\(\frac{-b + \sqrt{b^2-4\cdot a\cdot
-c}}{2\cdot a}\)</span> </td>
+<td><code>-b b 2 ^ 4 a c * * - sqrt + 2 a * /</code></td>
+<td><code>(-b + sqrt(b^2 - 4·a·c))/(2·a)</code></td>
 <td><code>NA</code></td>
 </tr>
 </tbody>

@@ -16,6 +16,7 @@ or watch the excellent explainer by [Computerphile](https://www.youtube.com/watc
 - `-`    **SUBTRACT**:    *subtract* the last two numbers on stack.
 - `*`    **MULTIPLY**:    *multiply* the last two numbers on stack.
 - `/`    **DIVIDE**:      *divide* the last two numbers on stack.
+- `\`    **DIVIDE**:      *divide* the last two numbers on stack, but the other way around.
 - `^`    **POWER**:       raise the second-to-last number to the *power* of the last number on stack.
 - `!`    **FACTORIAL**:   calculate the *factorial* of the last number on stack.
 - `~`    **NEGATE**:      *negate* the last number on stack.
@@ -26,20 +27,20 @@ or watch the excellent explainer by [Computerphile](https://www.youtube.com/watc
 
 You can use numbers or letters `a` to `z` as operands.
 If letters are used,
-the output will show a symbolic infix expression,
-and the numeric result will be marked as `NA`.
+a symbolic infix expression will be calculated,
+and the numeric output will be `NA`.
 
 #### Examples
 
 💡 **Tip**: Copy any example and paste it into the input box to test it!
 
-| RPN Input                              | Infix Notation                                      | Output (Stack) |
-| ---                                    | ---                                                 | ---            |
-| `2 3 + 4 -`                            | $2 + 3 - 4$                                         | `1`            |
-| `1 2 3 - - ~`                          | $-(1 - (2 - 3))$                                    | `-2`           |
-| `27 1 3 / ^`                           | $27^{\frac13}$                                      | `3`            |
-| `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`           | $\sqrt{(4 - 1)^2 + (8 - 4)^2}$                      | `5`            |
-| `-b b 2 ^ 4 a c * * - sqrt + 2 a * /`  | $\frac{-b + \sqrt{b^2-4\cdot a\cdot c}}{2\cdot a}$  | `NA`           |
+| RPN Input                             | Infix Notation                   | Output (Stack) |
+| ----                                  | ----                             | ----           |
+| `2 3 + 4 -`                           | `2 + 3 - 4`                      | `1`            |
+| `1 2 3 - - ~`                         | `-(1 - (2 - 3))`                 | `-2`           |
+| `27 1 3 / ^`                          | `27^(1/3)`                       | `3`            |
+| `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`          | `sqrt((4 - 1)^2 + (8 - 4)^2)`    | `5`            |
+| `-b b 2 ^ 4 a c * * - sqrt + 2 a * /` | `(-b + sqrt(b^2 - 4·a·c))/(2·a)` | `NA`           |
 
 ---
 
