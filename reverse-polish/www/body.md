@@ -23,19 +23,16 @@ Here are the *mathematical operators*:
 - `^`    **POWER**:       raise the second-to-last number to the *power* of the last number on stack.
 - `!`    **FACTORIAL**:   calculate the *factorial* of the last number on stack.
 - `~`    **NEGATE**:      *negate* the last number on stack.
-- `sqrt` **SQUARE ROOT**: calculate the *square root* of the last number on stack.
 - `abs`  **ABSOLUTE VALUE**: calculate the *absolute value* of the last number on stack.
-- `log` **LOGARITHM**: calculate the *natural logarithm* of the last number on stack.
+- `log`  **LOGARITHM**: calculate the *natural logarithm* of the last number on stack.
+- `exp`  **EXPONENTIAL**: calculate the *exponential* of the last number on stack.
+- `sqrt` **SQUARE ROOT**: calculate the *square root* of the last number on stack.
 
 And here are the *stack operators* that manipulate the stack:
 
 - `pop` **POP**: *pop*/remove the last number off the stack.
 - `dup` **DUPLICATE**: *duplicate* the last number on stack.
 - `swap` **SWAP**: *swap* the positions of the last two number on stack.
-- `roll` **ROLL**: syntax `n i roll` *rolls* the top $n$ elements on the stack around by a shift up of $i$ elements,
-  so `2 1 roll` is equivalent to `swap`.
-  Naturally, $n$ and $i$ must be (or will be coerced into) integers, and $n$ must be non-negative.
-  See example below.
 
 #### Available Operands
 
@@ -55,8 +52,6 @@ and the numeric output will be `NA`.
 | `27 1 3 / ^`                          | `3`             | `27^(1/3)`                       |
 | `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`          | `5`             | `sqrt((4 - 1)^2 + (8 - 4)^2)`    |
 | `-b b 2 ^ 4 a c * * - sqrt + 2 a * /` | `NA`            | `(-b + sqrt(b^2 - 4·a·c))/(2·a)` |
-| `a b c d e 5 2 roll`                  | `d, e, a, b, c` |                                  |
-| `a b c d e 5 -1 roll`                 | `b, c, d, e, a` |                                  |
 
 ---
 

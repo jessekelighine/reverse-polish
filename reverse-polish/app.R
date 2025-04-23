@@ -5,7 +5,7 @@
 # Author: Jesse C. Chen (website: jessekelighine.com)                         #
 # Description: Reverse Polish Notation                                        #
 #                                                                             #
-# Last Modified: 2025-04-14                                                   #
+# Last Modified: 2025-04-22                                                   #
 ###############################################################################
 options(scipen = 999999)
 library(shiny)
@@ -25,24 +25,9 @@ parse$is_operator <- function(item) item %in% names(operator)
 
 parse$is_operand <- function(item) {
   grepl(
-    pattern = "^[-]{0,1}(([0-9]*\\.){0,1}[0-9]+|[a-zA-Z])$",
+    pattern = "^[-]{0,1}(([0-9]*\\.){0,1}[0-9]+|[a-zA-Z]|pi)$",
     x = item
   )
-}
-
-parse$is_numeric <- function(item) {
-  grepl(
-    pattern = "^[-]{0,1}(([0-9]*\\.){0,1}[0-9]+)$",
-    x = item
-  )
-}
-
-parse$is_symbolic <- function(item) {
-  grepl(pattern = "^[-]{0,1}[a-zA-Z]$", x = item)
-}
-
-parse$is_integer <- function(item) {
-  all.equal(item, as.integer(item), check.attributes = FALSE)
 }
 
 ## Operators ##################################################################
@@ -174,7 +159,15 @@ operator[["log"]]$infix <- function(operator, infix, operand) {
   } else {
     infix_output <- paste0("\\log\\left(", infix[1], "\\right)")
   }
-  list(infix = infix_output, operator = "abs")
+  list(infix = infix_output, operator = "log")
+}
+
+operator[["exp"]] <- list()
+operator[["exp"]]$n <- 1
+operator[["exp"]]$eval <- function(operand) exp(as.numeric(operand))
+operator[["exp"]]$infix <- function(operator, infix, operand) {
+  infix_output <- paste0("\\exp\\left(", infix, "\\right)")
+  list(infix = infix_output, operator = "exp")
 }
 
 operator[["swap"]] <- list()
@@ -200,39 +193,6 @@ operator[["pop"]]$n <- 1
 operator[["pop"]]$eval <- function(operand) NULL
 operator[["pop"]]$infix <- function(operator, infix, operand) NULL
 
-operator[["roll"]] <- list()
-operator[["roll"]]$n <- 2
-operator[["roll"]]$eval <- function(operand) {
-  len <- length(operand)
-  if (len == 2) return(NULL)
-  i <- as.integer(operand[len]) %% as.integer(operand[len - 1])
-  actual_length <- len - 2
-  actual_operands <- operand[1:actual_length]
-  indices <- c(
-    if (i != 0) (actual_length - i + 1):actual_length,
-    1:(actual_length - i)
-  )
-  return(actual_operands[indices])
-}
-operator[["roll"]]$infix <- function(operator, infix, operand) {
-  len <- length(operand)
-  if (len == 2) return(NULL)
-  i <- as.integer(operand[len]) %% as.integer(operand[len - 1])
-  actual_length <- len - 2
-  actual_operator <- operator[1:actual_length]
-  actual_infix <- infix[1:actual_length]
-  indices <- c(
-    if (i != 0) (actual_length - i + 1):actual_length,
-    1:(actual_length - i)
-  )
-  return(list(
-    infix = actual_infix[indices],
-    operator = actual_operator[indices]
-  ))
-}
-
-operator[["roll"]]$eval(c(1, 2, 3, 4, 5, 5, -1))
-
 ## Main Functions #############################################################
 
 main <- function(command) {
@@ -243,8 +203,8 @@ main <- function(command) {
   stack$operator <- faststack()
   for (item in parse$split(command)) {
     if (parse$is_operand(item)) {
-      stack$value$push(item)
-      stack$infix$push(item)
+      stack$value$push((function(x) if (x == "pi") pi else x)(item))
+      stack$infix$push((function(x) if (x == "pi") "\\pi" else x)(item))
       stack$operator$push(item)
       next
     }
@@ -259,33 +219,6 @@ main <- function(command) {
       operators <- stack$operator$mpop(operator[[item]]$n) |> unlist() |> rev()
       infix <- stack$infix$mpop(operator[[item]]$n) |> unlist() |> rev()
       operand <- stack$value$mpop(operator[[item]]$n) |> unlist() |> rev()
-      if (item == "roll") {
-        if (operand[1] < 0 || !all(parse$is_numeric(operand))) {
-          error_message <- paste(
-            "ERROR: \"n\" and \"i\" in \"n i roll\" must be integers",
-            "and \"n\" must be non-negative"
-          )
-          return(list(value = error_message, infix = error_message))
-        }
-        operand <- round(as.numeric(operand))
-        if (stack$value$size() < operand[1]) {
-          error_message <- "ERROR: Not enough operands for \"roll\""
-          return(list(value = error_message, infix = error_message))
-        }
-        operators <- c(
-          if (operand[1] > 0)
-            stack$operator$mpop(operand[1]) |> unlist() |> rev(),
-          operators
-        )
-        infix <- c(
-          if (operand[1] > 0) stack$infix$mpop(operand[1]) |> unlist() |> rev(),
-          infix
-        )
-        operand <- c(
-          if (operand[1] > 0) stack$value$mpop(operand[1]) |> unlist() |> rev(),
-          operand
-        )
-      }
       output_infix <- operator[[item]]$infix(operators, infix, operand)
       output_value <- operator[[item]]$eval(operand)
       if (!is.null(output_value)) {
@@ -296,7 +229,7 @@ main <- function(command) {
       next
     }
     error_message <- paste(
-      "ERROR: Input",
+      "ERROR: ",
       paste0('"', item, '"'),
       "is not a legal command"
     )

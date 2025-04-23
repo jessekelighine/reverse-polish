@@ -28,12 +28,14 @@ number to the <em>power</em> of the last number on stack.</li>
 <em>factorial</em> of the last number on stack.</li>
 <li><code>~</code> <strong>NEGATE</strong>: <em>negate</em> the last
 number on stack.</li>
-<li><code>sqrt</code> <strong>SQUARE ROOT</strong>: calculate the
-<em>square root</em> of the last number on stack.</li>
 <li><code>abs</code> <strong>ABSOLUTE VALUE</strong>: calculate the
 <em>absolute value</em> of the last number on stack.</li>
 <li><code>log</code> <strong>LOGARITHM</strong>: calculate the
 <em>natural logarithm</em> of the last number on stack.</li>
+<li><code>exp</code> <strong>EXPONENTIAL</strong>: calculate the
+<em>exponential</em> of the last number on stack.</li>
+<li><code>sqrt</code> <strong>SQUARE ROOT</strong>: calculate the
+<em>square root</em> of the last number on stack.</li>
 </ul>
 <p>And here are the <em>stack operators</em> that manipulate the
 stack:</p>
@@ -44,15 +46,6 @@ number off the stack.</li>
 last number on stack.</li>
 <li><code>swap</code> <strong>SWAP</strong>: <em>swap</em> the positions
 of the last two number on stack.</li>
-<li><code>roll</code> <strong>ROLL</strong>: syntax
-<code>n i roll</code> <em>rolls</em> the top <span
-class="math inline">\(n\)</span> elements on the stack around by a shift
-up of <span class="math inline">\(i\)</span> elements, so
-<code>2 1 roll</code> is equivalent to <code>swap</code>. Naturally,
-<span class="math inline">\(n\)</span> and <span
-class="math inline">\(i\)</span> must be (or will be coerced into)
-integers, and <span class="math inline">\(n\)</span> must be
-non-negative. See example below.</li>
 </ul>
 <h4 id="available-operands">Available Operands</h4>
 <p>You can use numbers or letters <code>a</code> to <code>z</code> as
@@ -99,16 +92,6 @@ box to test it!</p>
 <td><code>-b b 2 ^ 4 a c * * - sqrt + 2 a * /</code></td>
 <td><code>NA</code></td>
 <td><code>(-b + sqrt(b^2 - 4·a·c))/(2·a)</code></td>
-</tr>
-<tr>
-<td><code>a b c d e 5 2 roll</code></td>
-<td><code>d, e, a, b, c</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>a b c d e 5 -1 roll</code></td>
-<td><code>b, c, d, e, a</code></td>
-<td></td>
 </tr>
 </tbody>
 </table>
