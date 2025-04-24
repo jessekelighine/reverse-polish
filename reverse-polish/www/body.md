@@ -53,8 +53,4 @@ and the numeric output will be `NA`.
 | `4 1 - 2 ^ 8 4 - 2 ^ + sqrt`          | `5`             | `sqrt((4 - 1)^2 + (8 - 4)^2)`    |
 | `-b b 2 ^ 4 a c * * - sqrt + 2 a * /` | `NA`            | `(-b + sqrt(b^2 - 4·a·c))/(2·a)` |
 
----
-
-Created by Jesse C. Chen ([jessekelighine.com](https://jessekelighine.com))
-<br>
 <br>
