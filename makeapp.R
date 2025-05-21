@@ -14,6 +14,11 @@ if (args == "shinylive") {
 if (args == "shinyapps") {
   library(rsconnect)
   # Get these information from `https://shinyapps.io`
+  rsconnect::setAccountInfo(
+    name = 'jessekelighine',
+    token = '50DBA2761FA248DB2F03C444F6451A41',
+    secret = 'GUED7l42H6uNkROtGj2cZeKewe6JNZ3AkFL4tqbi'
+  )
   rsconnect::setAccountInfo(name = "jessekelighine", token = "", secret = "")
   rsconnect::deployApp("reverse-polish/")
   quit()

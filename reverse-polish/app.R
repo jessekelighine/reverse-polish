@@ -5,7 +5,7 @@
 # Author: Jesse C. Chen (website: jessekelighine.com)                         #
 # Description: Reverse Polish Notation                                        #
 #                                                                             #
-# Last Modified: 2025-04-22                                                   #
+# Last Modified: 2025-05-20                                                   #
 ###############################################################################
 options(scipen = 999999)
 library(shiny)
@@ -102,7 +102,9 @@ operator[["^"]]$eval <- function(operand) {
 }
 operator[["^"]]$infix <- function(operator, infix, operand) {
   if (parse$is_negative(infix[1]) || !parse$is_operand(infix[1])) {
-    infix[1] <- paste0("\\left(", infix[1], "\\right)")
+    if (operator[1] != "abs") {
+      infix[1] <- paste0("\\left(", infix[1], "\\right)")
+    }
   }
   infix_output <- paste0(infix[1], "^{", infix[2], "}")
   list(infix = infix_output, operator = "^")
